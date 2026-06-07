@@ -1,0 +1,1 @@
+Caculates chances to generate white sparks based on total white sparks in lineage and using double/single circle or gold skills on your parent runs
