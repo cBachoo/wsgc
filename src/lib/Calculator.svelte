@@ -45,7 +45,7 @@
   function addSpark() {
     const name = nameInput.trim();
     if (!name) return;
-    calc.sparks.push({ name, cat: catInput, count: countInput });
+    calc.sparks.push({ name, cat: catInput, count: countInput, locked: false });
     nameInput = "";
   }
 
@@ -59,6 +59,11 @@
 
   function bump(s: Spark, delta: number) {
     s.count = Math.max(0, Math.min(6, s.count + delta));
+  }
+
+  // Locked sparks are assumed to always generate (the Rust side uses p = 1.0).
+  function toggleLock(s: Spark) {
+    s.locked = !s.locked;
   }
 
   // Most likely outcome (the mode of the distribution) for the callout.
@@ -208,6 +213,28 @@
               <span class="count">{s.count}</span>
               <button type="button" aria-label="more copies" onclick={() => bump(s, 1)}>+</button>
             </div>
+
+            <button
+              type="button"
+              class="lock-btn"
+              class:locked={s.locked}
+              aria-pressed={s.locked}
+              onclick={() => toggleLock(s)}
+              aria-label={s.locked ? "unlock spark" : "lock spark as guaranteed"}
+              title={s.locked ? "Locked — treated as guaranteed (100%)" : "Lock — treat as guaranteed"}
+            >
+              {#if s.locked}
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="5" y="11" width="14" height="9" rx="2" />
+                  <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                </svg>
+              {:else}
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="5" y="11" width="14" height="9" rx="2" />
+                  <path d="M8 11V7a4 4 0 0 1 8 0" />
+                </svg>
+              {/if}
+            </button>
 
             <div class="prob">
               <div class="prob-bar">

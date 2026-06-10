@@ -3,7 +3,9 @@
 
 export type Category = "white" | "double" | "gold";
 export type ModelKey = "exponential" | "piecewise" | "community";
-export type Spark = { name: string; cat: Category; count: number };
+// `locked` marks a spark as guaranteed to generate; the Rust side then treats
+// its probability as 1.0 in the distribution.
+export type Spark = { name: string; cat: Category; count: number; locked: boolean };
 
 export type SparkResult = Spark & { probability: number };
 export type CalcResult = {

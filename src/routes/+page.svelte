@@ -142,6 +142,7 @@
     <h1>White Spark Generation Calc</h1>
     <p class="tagline"><small>calc is slang for calculator btw</small></p>
     <button type="button" class="btn-add" onclick={addCalc}>+ New Calcparison</button>
+    <p class="tagline"><small>calcparison is slang for calculator comparison btw</small></p>
   </header>
 
   <div class="calcs">

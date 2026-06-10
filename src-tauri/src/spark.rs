@@ -82,6 +82,11 @@ pub struct Spark {
     pub name: String,
     pub cat: Category,
     pub count: u32,
+    /// When locked, the spark is treated as guaranteed to generate (p = 1.0),
+    /// so the distribution is "this spark, plus any number of the others".
+    /// `serde(default)` keeps older payloads without the field working.
+    #[serde(default)]
+    pub locked: bool,
 }
 
 /// A tracked spark plus its computed generation probability, sent back to the UI.
@@ -129,9 +134,16 @@ pub fn poisson_binomial(probs: &[f64]) -> Vec<f64> {
 
 /// Run the full calculation for a set of sparks under one model.
 pub fn calculate(sparks: &[Spark], model: Model) -> CalcResult {
+    // A locked spark is assumed to always generate, so it contributes p = 1.0.
     let probs: Vec<f64> = sparks
         .iter()
-        .map(|s| model.probability(s.cat, s.count))
+        .map(|s| {
+            if s.locked {
+                1.0
+            } else {
+                model.probability(s.cat, s.count)
+            }
+        })
         .collect();
 
     let expected = probs.iter().sum();
@@ -212,13 +224,28 @@ mod tests {
     #[test]
     fn expected_equals_sum_of_probs() {
         let sparks = vec![
-            Spark { name: "a".into(), cat: Category::White, count: 1 },
-            Spark { name: "b".into(), cat: Category::Gold, count: 0 },
+            Spark { name: "a".into(), cat: Category::White, count: 1, locked: false },
+            Spark { name: "b".into(), cat: Category::Gold, count: 0, locked: false },
         ];
         let result = calculate(&sparks, Model::Community);
         let manual: f64 = result.sparks.iter().map(|s| s.probability).sum();
         assert!(approx(result.expected, manual));
         // at_least[0] is "0 or more" -> always 1.0.
         assert!(approx(result.at_least[0], 1.0));
+    }
+
+    #[test]
+    fn locked_spark_is_guaranteed() {
+        let sparks = vec![
+            Spark { name: "gw".into(), cat: Category::White, count: 0, locked: true },
+            Spark { name: "other".into(), cat: Category::White, count: 0, locked: false },
+        ];
+        let result = calculate(&sparks, Model::Exponential);
+        // The locked spark always generates, so getting exactly 0 is impossible.
+        assert!(approx(result.dist[0], 0.0));
+        // "At least 1" is therefore certain.
+        assert!(approx(result.at_least[1], 1.0));
+        // The locked spark's own probability is reported as 1.0.
+        assert!(approx(result.sparks[0].probability, 1.0));
     }
 }
