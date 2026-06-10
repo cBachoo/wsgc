@@ -107,14 +107,6 @@ executable on Windows, macOS and Linux.
   (`Run workflow`). It builds the executables and uploads them as downloadable
   run artifacts without creating a release.
 
-## App icon
-
-Replace every icon from a single 1024×1024 PNG:
-
-```sh
-yarn tauri icon path/to/icon.png
-```
-
 ## Recommended IDE Setup
 
 [VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).

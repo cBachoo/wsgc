@@ -73,7 +73,7 @@ body {
 
 /* --- layout -------------------------------------------------------------- */
 .app {
-  max-width: 1040px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 1.75rem 1.25rem 4rem;
   display: flex;
@@ -81,14 +81,88 @@ body {
   gap: 1rem;
 }
 
-/* responsive rows: cards sit side-by-side when there's width, and stack
-   vertically when the window is narrow. auto-fit keys off the actual
-   available width, so no JS / window listeners. */
-.duo {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+/* Calculators sit side-by-side for comparison and wrap to the next row when
+   they'd get too narrow. */
+.calcs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+.calc-panel {
+  flex: 1 1 380px;
+  min-width: 300px;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
-  align-items: start;
+}
+
+/* per-calculator header: editable name + remove */
+.calc-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.calc-name {
+  flex: 1;
+  min-width: 0;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 0.3em 0.45em;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.calc-name:hover {
+  border-color: var(--border);
+}
+.calc-name:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+.calc-remove {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 1.4rem;
+  line-height: 1;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.calc-remove:hover {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+/* "new calc" button under the hero */
+.btn-add {
+  align-self: center;
+  margin-top: 0.8rem;
+  border: 1px dashed var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.45em 1.1em;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.btn-add:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
 }
 
 /* --- custom titlebar ----------------------------------------------------- */
