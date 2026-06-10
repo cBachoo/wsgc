@@ -1,0 +1,645 @@
+/* ===========================================================================
+   White Spark Generation Calc — global styles
+   ---------------------------------------------------------------------------
+   Single-page app, so styles live here as plain global CSS rather than inside
+   each component's scoped <style>. Class names are unique, so there's no
+   collision risk and the .svelte files stay markup-only.
+
+   Palette: Gruvbox (light by default, dark via <html data-theme="dark">).
+   Every colour is a CSS variable, so theming is just swapping the token block.
+
+   Calc is slang for calculator
+   =========================================================================== */
+
+/* --- design tokens: Gruvbox light ---------------------------------------- */
+:root {
+  --bg: #f2e5bc;          /* light0 soft  */
+  --surface: #fbf1c7;     /* light0       */
+  --surface-2: #ebdbb2;   /* light1       */
+  --border: #d5c4a1;      /* light2       */
+  --text: #3c3836;        /* dark1        */
+  --text-dim: #7c6f64;    /* dark4        */
+
+  --accent: #d65d0e;      /* orange       */
+  --accent-strong: #af3a03;
+  --accent-soft: rgba(214, 93, 14, 0.1);
+  --ring: rgba(214, 93, 14, 0.3);
+
+  --danger: #cc241d;      /* red          */
+  --danger-soft: #f2d3cf;
+
+  --white-c: #928374;     /* gray   — single circle */
+  --double-c: #458588;    /* blue   — double circle */
+  --gold-c: #b57614;      /* yellow — gold          */
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 2px rgba(60, 56, 54, 0.08), 0 1px 3px rgba(60, 56, 54, 0.12);
+
+  font-family: Inter, "Segoe UI", Avenir, Helvetica, Arial, sans-serif;
+  color: var(--text);
+  background-color: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* --- design tokens: Gruvbox dark ----------------------------------------- */
+html[data-theme="dark"] {
+  --bg: #1d2021;          /* dark0 hard   */
+  --surface: #282828;     /* dark0        */
+  --surface-2: #3c3836;   /* dark1        */
+  --border: #504945;      /* dark2        */
+  --text: #ebdbb2;        /* light1       */
+  --text-dim: #a89984;    /* light4 / gray*/
+
+  --accent: #fe8019;      /* bright orange*/
+  --accent-strong: #d65d0e;
+  --accent-soft: rgba(254, 128, 25, 0.14);
+  --ring: rgba(254, 128, 25, 0.32);
+
+  --danger: #fb4934;      /* bright red   */
+  --danger-soft: #432a26;
+
+  --white-c: #a89984;     /* gray         */
+  --double-c: #83a598;    /* bright blue  */
+  --gold-c: #fabd2f;      /* bright yellow*/
+
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+body {
+  margin: 0;
+}
+
+/* --- layout -------------------------------------------------------------- */
+.app {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* responsive rows: cards sit side-by-side when there's width, and stack
+   vertically when the window is narrow. auto-fit keys off the actual
+   available width, so no JS / window listeners. */
+.duo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+/* --- custom titlebar ----------------------------------------------------- */
+.titlebar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* icon left, window controls right */
+  padding: 0 0.3rem 0 0.55rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+  -webkit-user-select: none;
+}
+.titlebar-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+/* Centered across the full width regardless of the controls' width. */
+.titlebar-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+.titlebar-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.tb-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+  margin: 0 4px;
+}
+.tb-btn {
+  width: 2.3rem;
+  height: 1.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.tb-btn:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.tb-close:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
+/* --- hero ---------------------------------------------------------------- */
+.hero {
+  text-align: center;
+  margin-bottom: 0.25rem;
+}
+.hero h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+.tagline {
+  margin: 0.4rem auto 0;
+  max-width: 30rem;
+  color: var(--text-dim);
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+/* --- cards --------------------------------------------------------------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.1rem 1.2rem;
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+.card-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin: 0 0 0.7rem;
+}
+.card-head .card-title {
+  margin: 0;
+}
+
+/* --- add form ------------------------------------------------------------ */
+.add-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.field.grow {
+  flex: 1 1 12rem;
+}
+.field label,
+.field-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+}
+
+input[type="text"],
+input[type="number"] {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  padding: 0.5em 0.7em;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+input:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+input[type="number"] {
+  width: 3rem;
+  text-align: center;
+  -moz-appearance: textfield;
+  appearance: textfield;
+  border: none;
+  background: transparent;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* --- segmented control (type) ------------------------------------------- */
+.segmented {
+  display: inline-flex;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+  gap: 2px;
+}
+.seg {
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  padding: 0.4em 0.8em;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.seg:hover {
+  color: var(--text);
+}
+.seg.active {
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.seg-white.active {
+  color: var(--white-c);
+}
+.seg-double.active {
+  color: var(--double-c);
+}
+.seg-gold.active {
+  color: var(--gold-c);
+}
+
+/* --- stepper ------------------------------------------------------------- */
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  overflow: hidden;
+}
+.stepper button {
+  border: none;
+  background: var(--surface-2);
+  color: var(--text);
+  width: 2rem;
+  height: 2.1rem;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.stepper button:hover {
+  background: var(--border);
+}
+.stepper.sm button {
+  width: 1.7rem;
+  height: 1.7rem;
+  font-size: 1rem;
+}
+.stepper.sm .count {
+  min-width: 1.5rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* --- buttons ------------------------------------------------------------- */
+.btn-primary {
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  padding: 0.6em 1.2em;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-primary:hover {
+  background: var(--accent-strong);
+}
+.btn-ghost {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-dim);
+  padding: 0.35em 0.8em;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-ghost:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+/* --- model cards --------------------------------------------------------- */
+.models {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.6rem;
+}
+.model-card {
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  padding: 0.7rem 0.8rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.model-card:hover {
+  border-color: var(--accent);
+}
+.model-card.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 1px var(--accent) inset;
+}
+.model-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.model-desc {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.35;
+}
+
+/* --- empty state --------------------------------------------------------- */
+.empty {
+  text-align: center;
+  padding: 1.4rem 0 0.6rem;
+  color: var(--text-dim);
+}
+.empty p {
+  margin: 0.15rem 0;
+}
+.empty-hint {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+/* --- spark list ---------------------------------------------------------- */
+.spark-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+/* Two-row grid: identity + controls on top, probability bar full-width below.
+   The bar on its own row means the top row never has to fit a wide bar, so
+   the layout can't overflow no matter how narrow the card gets. */
+.spark-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  grid-template-areas:
+    "name type stepper remove"
+    "prob prob prob   prob";
+  align-items: center;
+  column-gap: 0.6rem;
+  row-gap: 0.5rem;
+  padding: 0.6rem 0.2rem;
+  border-bottom: 1px solid var(--border);
+}
+.spark-row:last-child {
+  border-bottom: none;
+}
+.spark-id {
+  grid-area: name;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.spark-name {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-white {
+  background: var(--white-c);
+}
+.dot-double {
+  background: var(--double-c);
+}
+.dot-gold {
+  background: var(--gold-c);
+}
+
+.type-select {
+  grid-area: type;
+  justify-self: start;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.2em 0.6em;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  background: var(--surface-2);
+  color: var(--text-dim);
+  cursor: pointer;
+}
+.badge-white {
+  color: var(--white-c);
+}
+.badge-double {
+  color: var(--double-c);
+}
+.badge-gold {
+  color: var(--gold-c);
+}
+
+.spark-row .stepper.sm {
+  grid-area: stepper;
+}
+.spark-row .remove {
+  grid-area: remove;
+}
+
+.prob {
+  grid-area: prob;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.prob-bar {
+  flex: 1;
+  height: 0.5rem;
+  background: var(--surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.prob-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+.fill-white {
+  background: var(--white-c);
+}
+.fill-double {
+  background: var(--double-c);
+}
+.fill-gold {
+  background: var(--gold-c);
+}
+.prob-val {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 0.85rem;
+  min-width: 3rem;
+  text-align: right;
+}
+
+.remove {
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 1.3rem;
+  line-height: 1;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.remove:hover {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+/* --- results ------------------------------------------------------------- */
+.summary {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1.1rem;
+  flex-wrap: wrap;
+}
+.stat {
+  flex: 1 1 8rem;
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 0.8rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.stat-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+}
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.stat-sub {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.dist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.dist-row {
+  display: grid;
+  grid-template-columns: 1.5rem 1fr 3.2rem 4rem;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.2rem 0.35rem;
+  border-radius: 6px;
+}
+.dist-row.peak {
+  background: var(--accent-soft);
+}
+.dist-k {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text-dim);
+}
+.dist-row.peak .dist-k {
+  color: var(--accent);
+}
+.dist-track {
+  height: 0.65rem;
+  background: var(--surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.dist-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+.dist-exact {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-align: right;
+}
+.dist-least {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  text-align: right;
+}
+.legend {
+  display: flex;
+  gap: 1.2rem;
+  margin: 0.8rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  justify-content: flex-end;
+}
+.legend-item b {
+  color: var(--text);
+}

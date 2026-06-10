@@ -1,0 +1,82 @@
+name: Release
+
+# Builds a portable, standalone executable (no installer) on Windows, macOS and
+# Linux using `tauri build --no-bundle`.
+#   * Push a tag like `v0.1.0`  -> builds the binaries AND attaches them to a
+#     draft GitHub Release.
+#   * Run manually (workflow_dispatch) -> builds the binaries and uploads them
+#     as downloadable run artifacts, without creating a release.
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+      contents: write # needed to create the release / upload assets
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            bin: wsgc.exe
+            asset: wsgc-windows.exe
+          - platform: macos-latest
+            bin: wsgc
+            asset: wsgc-macos
+          - platform: ubuntu-22.04
+            bin: wsgc
+            asset: wsgc-linux
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux build dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev librsvg2-dev
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Install frontend dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build portable executable (no installer)
+        run: yarn tauri build --no-bundle
+
+      - name: Stage binary
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp "src-tauri/target/release/${{ matrix.bin }}" "dist/${{ matrix.asset }}"
+
+      - name: Upload run artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: dist/${{ matrix.asset }}
+
+      - name: Attach to GitHub Release (on tag)
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          name: WSGC ${{ github.ref_name }}
+          body: "Portable executables — download the one for your platform and run it directly (no install)."
+          files: dist/${{ matrix.asset }}
